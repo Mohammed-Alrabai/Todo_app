@@ -1,0 +1,25 @@
+@font-face {
+    font-family:Alexandria;
+    src: url("../public/font/Alexandria/static/Alexandria-Thin.ttf");
+    font-weight: 100;
+}
+@font-face{
+    font-family:Alexandria;
+    src: url("../public/font/Alexandria/static/Alexandria-Light.ttf");
+    font-weight: 300;
+}
+@font-face {
+    font-family: Alexandria;
+    src: url("../public/font/Alexandria/static/Alexandria-Regular.ttf");
+    font-weight: 400;
+}
+@font-face {
+    font-family: Alexandria;
+    src: url("../public/font/Alexandria/static/Alexandria-Medium.ttf");
+    font-weight: 500;
+}
+@font-face {
+    font-family: Alexandria;
+    src: url("../public/font/Alexandria/static/Alexandria-Bold.ttf");
+    font-weight: 700;
+}
