@@ -14,17 +14,22 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Badge,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+
 import React from "react";
 import Todo from "./Todo";
 import { v4 as uuidv4 } from "uuid";
 import { useState, useContext, useEffect } from "react";
 import TodoContext from "../context/todoContext";
+import { ColorsContext } from "../context/colorsContext";
 
 function TodoList() {
   const [isLoading, setIsLoading] = useState(true);
   const [addTodo, setAddTodo] = useState("");
   const { todos, setTodos } = useContext(TodoContext);
+  const { colors, setColors } = useContext(ColorsContext);
   const [todoType, setTodoType] = useState("all");
 
   const handelAddTodo = () => {
@@ -54,17 +59,14 @@ function TodoList() {
     displayTodos = uncompleted;
   } else {
     displayTodos = todos;
-    
   }
-    const todo = displayTodos.map((todo) => {
-      return <Todo key={todo.id} todo={todo} />;
-    });
+  const todo = displayTodos.map((todo) => {
+    return <Todo key={todo.id} todo={todo} />;
+  });
   const handelCheckTodo = (e) => {
     setTodoType(e.target.value);
     console.log(e.target.value);
-  }
-
-
+  };
   return (
     <>
       <Container maxWidth="sm" sx={{ mt: 10, mb: 10 }}>
@@ -85,6 +87,13 @@ function TodoList() {
               gutterBottom>
               مهامي
             </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}>
+            </Box>
             <Divider sx={{ mb: 1.5 }} />
             {/* Button Group */}
             <Box
