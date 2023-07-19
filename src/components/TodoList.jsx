@@ -2,57 +2,71 @@ import {
   Button,
   Card,
   Container,
-  Stack,
   Typography,
-  CardActions,
   CardContent,
   Divider,
-  ButtonGroup,
   Box,
   Grid,
-  Input,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Badge,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-
 import React from "react";
 import Todo from "./Todo";
-import { v4 as uuidv4 } from "uuid";
-import { useState, useContext, useEffect } from "react";
-import TodoContext from "../context/todoContext";
-import { ColorsContext } from "../context/colorsContext";
+import { useState, useEffect, useMemo } from "react";
+import { useSnackBar } from "../context/SnackbarContext";
+
+import { useTodo } from "../context/todoContext";
+import { useDispatch } from "../context/todoContext";
 
 function TodoList() {
-  const [isLoading, setIsLoading] = useState(true);
   const [addTodo, setAddTodo] = useState("");
-  const { todos, setTodos } = useContext(TodoContext);
-  const { colors, setColors } = useContext(ColorsContext);
+
+  const [open, setOpen] = useState(false);
+  const [edit, setEdit] = useState(false);
+
+  const [dialogTodo, setDialogTodo] = useState(null);
+
+  const { showSnackbar } = useSnackBar();
+  const { todos } = useTodo();
+  const dispatch = useDispatch();
+
   const [todoType, setTodoType] = useState("all");
 
   const handelAddTodo = () => {
-    const updateTodos = [
-      ...todos,
-      { id: uuidv4(), title: addTodo, description: "", completed: false },
-    ];
-    setTodos(updateTodos);
-    localStorage.setItem("todos", JSON.stringify(updateTodos));
+    dispatch({
+      type: "ADD_TODO",
+      payload: { addTodo },
+    });
     setAddTodo("");
+    showSnackbar("تم الاضافة بنجاح");
   };
 
   useEffect(() => {
-    const localTodos = JSON.parse(localStorage.getItem("todos"));
-    if (localTodos) {
-      setTodos(localTodos);
-      setIsLoading(false);
-    }
+    dispatch({
+      type: "GET_TODO",
+    });
   }, []);
 
-  const completed = todos.filter((todo) => todo.completed);
-  const uncompleted = todos.filter((todo) => !todo.completed);
+  const completed = useMemo(() => {
+    return todos.filter((todo) => {
+      return todo.completed;
+    });
+  }, [todos]);
+
+  const uncompleted = useMemo(() => {
+    return todos.filter((todo) => {
+      return !todo.completed;
+    });
+  }, [todos]);
+
   let displayTodos = todos;
+
   if (todoType === "completed") {
     displayTodos = completed;
   } else if (todoType === "uncompleted") {
@@ -60,15 +74,123 @@ function TodoList() {
   } else {
     displayTodos = todos;
   }
+
+  const showDelete = (todo) => {
+    setDialogTodo(todo);
+    setOpen(true);
+  };
+  
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const todoDelete = () => {
+    dispatch({
+      type: "DELETE_TODO",
+      payload: {
+        id: dialogTodo.id,
+      },
+    });
+    showSnackbar("تم الحذف بنجاح", "error");
+    setOpen(false);
+  };
+
+  const showEdit = (todo) => {
+    setDialogTodo(todo);
+    setEdit(true);
+  };
+
+  const handleEditClose = () => {
+    setEdit(false);
+  };
+  const handelEdit = () => {
+    dispatch({
+      type: "EDIT_TODO",
+      payload: {
+        id: dialogTodo.id,
+        title: dialogTodo.title,
+        description: dialogTodo.description,
+      },
+    });
+    setEdit(false);
+    showSnackbar("تم التعديل بنجاح");
+  };
+
   const todo = displayTodos.map((todo) => {
-    return <Todo key={todo.id} todo={todo} />;
+    return (
+      <Todo
+        key={todo.id}
+        todo={todo}
+        showDelete={showDelete}
+        showEdit={showEdit}
+      />
+    );
   });
   const handelCheckTodo = (e) => {
     setTodoType(e.target.value);
-    console.log(e.target.value);
   };
+
   return (
     <>
+      {/* Dialog for delete */}
+      <Dialog
+        open={open}
+        keepMounted
+        style={{ direction: "rtl" }}
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description">
+        <DialogTitle>{"هل أنت متأكد من حذف؟"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            هل أنت متأكد من حذف هذه المهمه؟
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>الغاء</Button>
+          <Button onClick={todoDelete} autoFocus>
+            تأكيد
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Dialog for update */}
+      <Dialog
+        open={edit}
+        keepMounted
+        onClose={handleEditClose}
+        style={{ direction: "rtl" }}
+        aria-describedby="alert-dialog-slide-description">
+        <DialogTitle>{"تعديل المهمه"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            تعديل المهمه
+          </DialogContentText>
+          <TextField
+            sx={{ width: "100%", mt: "1rem" }}
+            label="عنوان المهمه"
+            id="outlined-basic"
+            variant="outlined"
+            value={dialogTodo?.title}
+            onChange={(e) =>
+              setDialogTodo({ ...dialogTodo, title: e.target.value })
+            }
+          />
+          <TextField
+            sx={{ width: "100%", mt: "1rem" }}
+            label="وصف المهمه"
+            id="outlined-basic"
+            variant="outlined"
+            value={dialogTodo?.description}
+            onChange={(e) =>
+              setDialogTodo({ ...dialogTodo, description: e.target.value })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose}>الغاء</Button>
+          <Button onClick={handelEdit} autoFocus>
+            تعديل
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Container maxWidth="sm" sx={{ mt: 10, mb: 10 }}>
         <Card
           sx={{ minWidth: 275, overflowY: "scroll", maxHeight: "80vh" }}
@@ -92,8 +214,7 @@ function TodoList() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-              }}>
-            </Box>
+              }}></Box>
             <Divider sx={{ mb: 1.5 }} />
             {/* Button Group */}
             <Box
