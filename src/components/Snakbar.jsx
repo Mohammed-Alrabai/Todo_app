@@ -1,6 +1,4 @@
 import * as React from "react";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { SnackBarContext } from "../context/SnackbarContext";
@@ -23,12 +21,11 @@ export default function CustomizedSnackbars({ open, setOpen , message , type }) 
     <Snackbar
       open={open}
       autoHideDuration={6000}
-      onClose={handleClose}>
-      <Alert
-        onClose={handleClose}
-        severity={type}
-        sx={{ width: "100%", textAlign: "right", ml: "1rem", direction: "rtl" }}>
-        {message} 
+      onClose={handleClose}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+      <Alert onClose={handleClose} severity={type} variant="filled" sx={{ direction: "rtl" }}>
+        <span style={{padding: "0 1rem"}}>{message}</span>
       </Alert>
     </Snackbar>
   );

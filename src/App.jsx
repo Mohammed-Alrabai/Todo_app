@@ -23,6 +23,9 @@ function App() {
       mode: "light" 
     },
   });
+  const changeColor = (color) => {
+    setColors(color);
+  }
   return (
     <>
       <ColorsContext.Provider value={{ colors, setColors }}>
@@ -42,7 +45,7 @@ function App() {
                 justifyContent: "center",
                 alignItems: "center",
               }}>
-                <TodoList />
+                <TodoList theme={theme} changeColor={changeColor}  />
             </div>
           </ThemeProvider>
         </SnckBarProvider>

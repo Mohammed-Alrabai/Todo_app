@@ -24,7 +24,7 @@ import { useSnackBar } from "../context/SnackbarContext";
 import { useTodo } from "../context/todoContext";
 import { useDispatch } from "../context/todoContext";
 
-function TodoList() {
+function TodoList({ theme, changeColor }) {
   const [addTodo, setAddTodo] = useState("");
 
   const [open, setOpen] = useState(false);
@@ -79,7 +79,7 @@ function TodoList() {
     setDialogTodo(todo);
     setOpen(true);
   };
-  
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -112,7 +112,7 @@ function TodoList() {
       },
     });
     setEdit(false);
-    showSnackbar("تم التعديل بنجاح");
+    showSnackbar("تم التعديل بنجاح", "info");
   };
 
   const todo = displayTodos.map((todo) => {
@@ -129,6 +129,26 @@ function TodoList() {
     setTodoType(e.target.value);
   };
 
+  const handelChangeColor = () => {
+    const color = [
+      "#0E2954",
+      "#FFB07F",
+      "#F31559",
+      "#FF8E53",
+      "#35A29F",
+      "#AAC8A7",
+      "#6527BE",
+      "#3AA6B9",
+      "#525FE1",
+      "#F2BE22",
+      "#F31559",
+      "#4E4FEB",
+      "#98EECC",
+    ];
+    // Random color
+    const randomColor = color[Math.floor(Math.random() * color.length)];
+    changeColor(randomColor);
+  };
   return (
     <>
       {/* Dialog for delete */}
@@ -163,6 +183,7 @@ function TodoList() {
           <DialogContentText id="alert-dialog-slide-description">
             تعديل المهمه
           </DialogContentText>
+
           <TextField
             sx={{ width: "100%", mt: "1rem" }}
             label="عنوان المهمه"
@@ -196,6 +217,13 @@ function TodoList() {
           sx={{ minWidth: 275, overflowY: "scroll", maxHeight: "80vh" }}
           variant="outlined">
           <CardContent>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                handelChangeColor();
+              }}>
+              تغيير اللون
+            </Button>
             <Typography
               variant="h1"
               sx={{
